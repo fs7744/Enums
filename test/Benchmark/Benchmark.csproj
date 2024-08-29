@@ -21,5 +21,9 @@
 		<Content Include="Generated\**" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <ProjectReference Include="..\..\src\SV.Enums\SV.Enums.csproj" />
+	</ItemGroup>
+
 
 </Project>

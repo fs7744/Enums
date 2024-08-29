@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
@@ -35,6 +35,10 @@
 	<ItemGroup>
 		<Compile Remove="Generated\**" />
 		<Content Include="Generated\**" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\..\src\SV.Enums\SV.Enums.csproj" />
 	</ItemGroup>
 
 </Project>
