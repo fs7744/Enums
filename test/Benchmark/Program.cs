@@ -1,3 +1,5 @@
-﻿using BenchmarkDotNet.Running;
+﻿using Benchmark;
+using BenchmarkDotNet.Running;
 
-var summary = BenchmarkRunner.Run(typeof(Program).Assembly);
+var summary = BenchmarkRunner.Run<EnumBenchmarks>();
+//var summary = BenchmarkRunner.Run(typeof(Program).Assembly);
