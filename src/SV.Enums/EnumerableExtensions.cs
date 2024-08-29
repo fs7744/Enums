@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -66,6 +67,29 @@ namespace System.Linq
                     yield break;
                 }
             }
+        }
+
+        public static bool TryGetNonEnumeratedCount<TSource>(this IEnumerable<TSource> source, out int count)
+        {
+            if (source is null)
+            {
+                throw new ArgumentNullException("source");
+            }
+
+            if (source is ICollection<TSource> collectionoft)
+            {
+                count = collectionoft.Count;
+                return true;
+            }
+
+            if (source is ICollection collection)
+            {
+                count = collection.Count;
+                return true;
+            }
+
+            count = 0;
+            return false;
         }
 #endif
 

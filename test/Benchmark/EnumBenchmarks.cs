@@ -25,6 +25,14 @@ namespace Benchmark
     [MemoryDiagnoser, Orderer(summaryOrderPolicy: SummaryOrderPolicy.FastestToSlowest), GroupBenchmarksBy(BenchmarkLogicalGroupRule.ByCategory), CategoriesColumn]
     public class EnumBenchmarks
     {
+        private readonly EnumInfo<Fruits> test;
+
+        public EnumBenchmarks()
+        {
+           test = new EnumInfo<Fruits>();
+            Enums.SetEnumInfo<Fruits>(new TestIEnumInfo());
+        }
+
         [Benchmark(Baseline = true), BenchmarkCategory("IgnoreCase")]
         public Fruits ParseIgnoreCase()
         {
@@ -44,6 +52,13 @@ namespace Benchmark
             return v;
         }
 
+        [Benchmark, BenchmarkCategory("IgnoreCase")]
+        public Fruits EnumInfoParseIgnoreCase()
+        {
+            test.TryParse("melon", true, out var v);
+            return v;
+        }
+
         [Benchmark(Baseline = true)]
         public Fruits Parse()
         {
@@ -59,8 +74,73 @@ namespace Benchmark
         [Benchmark]
         public Fruits SVEnumsParse()
         {
-            Enums<Fruits>.TryParse("Melon", false, out var v);
+            Enums<Fruits>.TryParse("Melon", out var v);
             return v;
+        }
+
+        [Benchmark]
+        public Fruits EnumInfoParse()
+        {
+            test.TryParse("Melon", false, out var v);
+            return v;
+        }
+    }
+
+    public class TestIEnumInfo : EnumBase<Fruits>
+    {
+        protected override bool TryParseCase(in ReadOnlySpan<char> name, out Fruits result)
+        {
+            switch (name)
+            {
+                case ReadOnlySpan<char> current when current.Equals(nameof(global::Benchmark.Fruits.Apple).AsSpan(), global::System.StringComparison.Ordinal):
+                    result = global::Benchmark.Fruits.Apple;
+                    return true;
+                case ReadOnlySpan<char> current when current.Equals(nameof(global::Benchmark.Fruits.Lemon).AsSpan(), global::System.StringComparison.Ordinal):
+                    result = global::Benchmark.Fruits.Lemon;
+                    return true;
+                case ReadOnlySpan<char> current when current.Equals(nameof(global::Benchmark.Fruits.Melon).AsSpan(), global::System.StringComparison.Ordinal):
+                    result = global::Benchmark.Fruits.Melon;
+                    return true;
+                case ReadOnlySpan<char> current when current.Equals(nameof(global::Benchmark.Fruits.Banana).AsSpan(), global::System.StringComparison.Ordinal):
+                    result = global::Benchmark.Fruits.Banana;
+                    return true;
+                default:
+                    result = default;
+                    return false;
+            }
+        }
+
+        protected override bool TryParseIgnoreCase(in ReadOnlySpan<char> name, out Fruits result)
+        {
+            switch (name)
+            {
+                case ReadOnlySpan<char> current when current.Equals(nameof(global::Benchmark.Fruits.Apple).AsSpan(), global::System.StringComparison.OrdinalIgnoreCase):
+                    result = global::Benchmark.Fruits.Apple;
+                    return true;
+                case ReadOnlySpan<char> current when current.Equals(nameof(global::Benchmark.Fruits.Lemon).AsSpan(), global::System.StringComparison.OrdinalIgnoreCase):
+                    result = global::Benchmark.Fruits.Lemon;
+                    return true;
+                case ReadOnlySpan<char> current when current.Equals(nameof(global::Benchmark.Fruits.Melon).AsSpan(), global::System.StringComparison.OrdinalIgnoreCase):
+                    result = global::Benchmark.Fruits.Melon;
+                    return true;
+                case ReadOnlySpan<char> current when current.Equals(nameof(global::Benchmark.Fruits.Banana).AsSpan(), global::System.StringComparison.OrdinalIgnoreCase):
+                    result = global::Benchmark.Fruits.Banana;
+                    return true;
+                default:
+                    result = default;
+                    return false;
+            }
+        }
+
+        protected override bool TryParseUnderlyingTypeString(string value, out Fruits result)
+        {
+            if (int.TryParse(value, out var numericResult))
+            { 
+                result = (Fruits)numericResult;
+                return true;
+            }
+            result = default;
+            return false;
         }
     }
 }
