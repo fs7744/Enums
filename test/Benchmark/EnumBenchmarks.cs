@@ -25,22 +25,41 @@ namespace Benchmark
     [MemoryDiagnoser, Orderer(summaryOrderPolicy: SummaryOrderPolicy.FastestToSlowest), GroupBenchmarksBy(BenchmarkLogicalGroupRule.ByCategory), CategoriesColumn]
     public class EnumBenchmarks
     {
+        [Benchmark(Baseline = true), BenchmarkCategory("IgnoreCase")]
+        public Fruits ParseIgnoreCase()
+        {
+            return Enum.Parse<Fruits>("melon", true);
+        }
+
+        [Benchmark, BenchmarkCategory("IgnoreCase")]
+        public Fruits FastEnumParseIgnoreCase()
+        {
+            return FastEnum.Parse<Fruits>("melon", true);
+        }
+
+        [Benchmark, BenchmarkCategory("IgnoreCase")]
+        public Fruits SVEnumsParseIgnoreCase()
+        {
+            Enums<Fruits>.TryParse("melon", true, out var v);
+            return v;
+        }
+
         [Benchmark(Baseline = true)]
         public Fruits Parse()
         {
-            return Enum.Parse<Fruits>("melon", true);
+            return Enum.Parse<Fruits>("Melon", false);
         }
 
         [Benchmark]
         public Fruits FastEnumParse()
         {
-            return FastEnum.Parse<Fruits>("melon", true);
+            return FastEnum.Parse<Fruits>("Melon", false);
         }
 
         [Benchmark]
         public Fruits SVEnumsParse()
         {
-            Enums<Fruits>.TryParse("melon", true, out var v);
+            Enums<Fruits>.TryParse("Melon", false, out var v);
             return v;
         }
     }

@@ -9,15 +9,41 @@ using System.Threading.Tasks;
 
 namespace SV
 {
+    public interface IEnumUnderlyingTypeInfo
+    {
+        public bool TryParse<T>(string name, out T result) where T : struct, Enum;
+    }
+
+    public class Int32EnumUnderlyingTypeInfo : IEnumUnderlyingTypeInfo
+    {
+        public bool TryParse<T>(string name, out T result) where T : struct, Enum
+        {
+            if (int.TryParse(name, out var v))
+            {
+                result = Unsafe.As<int, T>(ref v);
+                return true;
+            }
+            result = default;
+            return false;
+        }
+    }
+
     public interface IEnumInfo<T> where T : struct, Enum
     {
         public bool TryParse(string name, bool ignoreCase, out T result);
 
         public bool TryParse(string name, out T result);
+
+        Type GetUnderlyingType();
     }
 
     public static class Enums
     {
+        internal static readonly FrozenDictionary<Type, IEnumUnderlyingTypeInfo> EnumUnderlyingTypeInfos = new Dictionary<Type, IEnumUnderlyingTypeInfo>()
+        {
+            { typeof(int),  new Int32EnumUnderlyingTypeInfo() }
+        }.ToFrozenDictionary();
+
 #if NETCOREAPP3_0_OR_GREATER
         internal const MethodImplOptions Optimization = MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization;
 #else
@@ -57,19 +83,23 @@ namespace SV
 
     internal class EnumInfo<T> : IEnumInfo<T> where T : struct, Enum
     {
-        private readonly (string Name, T Value)[] Members;
+        private readonly (string Name, T Value)[] members;
+        private readonly IEnumUnderlyingTypeInfo enumUnderlyingTypeInfo;
+        private readonly Type underlyingType;
 
         public EnumInfo()
         {
             var t = typeof(T);
             var names = Enum.GetNames(t);
-            Members = names.Select(i => (i, (T)Enum.Parse(t, i))).ToArray();
+            members = names.Select(i => (i, (T)Enum.Parse(t, i))).ToArray();
+            underlyingType = Enum.GetUnderlyingType(t);
+            enumUnderlyingTypeInfo = Enums.EnumUnderlyingTypeInfos[underlyingType];
         }
 
         [MethodImpl(Enums.Optimization)]
         public bool TryParseIgnoreCase(ReadOnlySpan<char> name, out T result)
         {
-            foreach (var member in Members.AsSpan())
+            foreach (var member in members.AsSpan())
             {
                 if (name.Equals(member.Name.AsSpan(), StringComparison.OrdinalIgnoreCase))
                 {
@@ -82,9 +112,9 @@ namespace SV
         }
 
         [MethodImpl(Enums.Optimization)]
-        public bool TryParse(ReadOnlySpan<char> name, out T result)
+        private bool TryParseInternal(ReadOnlySpan<char> name, out T result)
         {
-            foreach (var member in Members.AsSpan())
+            foreach (var member in members.AsSpan())
             {
                 if (name.Equals(member.Name.AsSpan(), StringComparison.Ordinal))
                 {
@@ -98,12 +128,26 @@ namespace SV
 
         public bool TryParse(string name, bool ignoreCase, out T result)
         {
-            return ignoreCase ? TryParseIgnoreCase(name.AsSpan(), out result) : TryParse(name, out result);
+            if (ignoreCase ? TryParseIgnoreCase(name.AsSpan(), out result) : TryParseInternal(name.AsSpan(), out result))
+            {
+                return true;
+            }
+            if (enumUnderlyingTypeInfo.TryParse(name, out result))
+                return true;
+            return false;
         }
 
         public bool TryParse(string name, out T result)
         {
-            return TryParse(name, out result);
+            if (TryParseInternal(name.AsSpan(), out result))
+            {
+                return true;
+            }
+            if (enumUnderlyingTypeInfo.TryParse(name, out result))
+                return true;
+            return false;
         }
+
+        public Type GetUnderlyingType() => underlyingType;
     }
 }
