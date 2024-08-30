@@ -13,25 +13,6 @@ using System.Xml.Linq;
 
 namespace SV
 {
-    public interface IEnumUnderlyingTypeInfo
-    {
-        public bool TryParse<T>(string name, out T result) where T : struct, Enum;
-    }
-
-    public class Int32EnumUnderlyingTypeInfo : IEnumUnderlyingTypeInfo
-    {
-        public bool TryParse<T>(string name, out T result) where T : struct, Enum
-        {
-            if (int.TryParse(name, out var v))
-            {
-                result = Unsafe.As<int, T>(ref v);
-                return true;
-            }
-            result = default;
-            return false;
-        }
-    }
-
     public interface IEnumInfo<T> where T : struct, Enum
     {
         public bool TryParse(string name, bool ignoreCase, out T result);
@@ -39,6 +20,8 @@ namespace SV
         public bool TryParse(string name, out T result);
 
         Type GetUnderlyingType();
+
+        TypeCode GetUnderlyingTypeCode();
 
         string GetName(T t);
 
@@ -55,7 +38,8 @@ namespace SV
 
     public abstract class EnumBase<T> : IEnumInfo<T> where T : struct, Enum
     {
-        private readonly Type underlyingType;
+        protected readonly Type underlyingType;
+        protected readonly TypeCode underlyingTypeCode;
         private string[] names;
         private readonly T[] values;
         public bool IsFlags { get; private set; }
@@ -65,6 +49,7 @@ namespace SV
         {
             var t = typeof(T);
             underlyingType = Enum.GetUnderlyingType(t);
+            underlyingTypeCode = Type.GetTypeCode(underlyingType);
             names = Enum.GetNames(t);
             values = names.Select(i => (T)Enum.Parse(t, i)).ToArray();
             IsFlags = t.IsDefined(typeof(FlagsAttribute), true);
@@ -72,11 +57,11 @@ namespace SV
 
         public Type GetUnderlyingType() => underlyingType;
 
+        public TypeCode GetUnderlyingTypeCode() => underlyingTypeCode;
+
         protected abstract bool TryParseIgnoreCase(in ReadOnlySpan<char> name, out T result);
 
         protected abstract bool TryParseCase(in ReadOnlySpan<char> name, out T result);
-
-        protected abstract bool TryParseUnderlyingTypeString(string value, out T result);
 
         public abstract string GetName(T t);
 
@@ -98,7 +83,7 @@ namespace SV
             {
                 return true;
             }
-            if (TryParseUnderlyingTypeString(name, out result))
+            if (Enums.TryParseUnderlyingTypeString<T>(underlyingTypeCode, name, out result))
                 return true;
             return false;
         }
@@ -109,7 +94,7 @@ namespace SV
             {
                 return true;
             }
-            if (TryParseUnderlyingTypeString(name, out result))
+            if (Enums.TryParseUnderlyingTypeString<T>(underlyingTypeCode, name, out result))
                 return true;
             return false;
         }
@@ -117,11 +102,6 @@ namespace SV
 
     public static class Enums
     {
-        internal static readonly IReadOnlyDictionary<Type, IEnumUnderlyingTypeInfo> EnumUnderlyingTypeInfos = new FastReadOnlyDictionary<Type, IEnumUnderlyingTypeInfo>(new KeyValuePair<Type, IEnumUnderlyingTypeInfo>[]
-        {
-            new KeyValuePair<Type, IEnumUnderlyingTypeInfo>(typeof(int),  new Int32EnumUnderlyingTypeInfo() )
-        });
-
 #if NETCOREAPP3_0_OR_GREATER
         internal const MethodImplOptions Optimization = MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization;
 #else
@@ -131,6 +111,136 @@ namespace SV
         public static void SetEnumInfo<T>(IEnumInfo<T> enumInfo) where T : struct, Enum
         {
             Enums<T>.Info = enumInfo;
+        }
+
+        internal static bool TryParseUnderlyingTypeString<T>(TypeCode underlyingTypeCode, string value, out T result) where T : struct, Enum
+        {
+            switch (underlyingTypeCode)
+            {
+                case TypeCode.Byte:
+                    {
+                        if (Byte.TryParse(value, out var v))
+                        {
+                            result = Unsafe.As<Byte, T>(ref v);
+                            return true;
+                        }
+                    }
+                    break;
+
+                case TypeCode.Int16:
+                    {
+                        if (short.TryParse(value, out var v))
+                        {
+                            result = Unsafe.As<short, T>(ref v);
+                            return true;
+                        }
+                    }
+                    break;
+
+                case TypeCode.Int32:
+                    {
+                        if (int.TryParse(value, out var v))
+                        {
+                            result = Unsafe.As<int, T>(ref v);
+                            return true;
+                        }
+                    }
+                    break;
+
+                case TypeCode.Int64:
+                    {
+                        if (long.TryParse(value, out var v))
+                        {
+                            result = Unsafe.As<long, T>(ref v);
+                            return true;
+                        }
+                    }
+                    break;
+
+                case TypeCode.SByte:
+                    {
+                        if (sbyte.TryParse(value, out var v))
+                        {
+                            result = Unsafe.As<sbyte, T>(ref v);
+                            return true;
+                        }
+                    }
+                    break;
+
+                case TypeCode.Single:
+                    {
+                        if (Single.TryParse(value, out var v))
+                        {
+                            result = Unsafe.As<Single, T>(ref v);
+                            return true;
+                        }
+                    }
+                    break;
+
+                case TypeCode.UInt16:
+                    {
+                        if (UInt16.TryParse(value, out var v))
+                        {
+                            result = Unsafe.As<UInt16, T>(ref v);
+                            return true;
+                        }
+                    }
+                    break;
+
+                case TypeCode.UInt32:
+                    {
+                        if (UInt32.TryParse(value, out var v))
+                        {
+                            result = Unsafe.As<UInt32, T>(ref v);
+                            return true;
+                        }
+                    }
+                    break;
+
+                case TypeCode.UInt64:
+                    {
+                        if (UInt32.TryParse(value, out var v))
+                        {
+                            result = Unsafe.As<UInt32, T>(ref v);
+                            return true;
+                        }
+                    }
+                    break;
+
+                case TypeCode.Char:
+                    {
+                        if (Char.TryParse(value, out var v))
+                        {
+                            result = Unsafe.As<Char, T>(ref v);
+                            return true;
+                        }
+                    }
+                    break;
+
+                case TypeCode.Boolean:
+                    {
+                        if (Boolean.TryParse(value, out var v))
+                        {
+                            var vv = v ? 1L : 0L;
+                            result = Unsafe.As<long, T>(ref vv);
+                            return true;
+                        }
+                    }
+                    break;
+
+                case TypeCode.DateTime:
+                case TypeCode.DBNull:
+                case TypeCode.Decimal:
+                case TypeCode.Double:
+                case TypeCode.String:
+                case TypeCode.Empty:
+                case TypeCode.Object:
+                default:
+                    break;
+            }
+
+            result = default;
+            return false;
         }
     }
 
@@ -194,6 +304,69 @@ namespace SV
         {
             return CheckInfo().IsDefined(name);
         }
+
+        public static Type GetUnderlyingType() => CheckInfo().GetUnderlyingType();
+
+        public static TypeCode GetUnderlyingTypeCode() => CheckInfo().GetUnderlyingTypeCode();
+
+        public static T ToEnum(int value)
+        {
+            switch (GetUnderlyingTypeCode())
+            {
+                case TypeCode.Int32:
+                    return Unsafe.As<int, T>(ref value);
+
+                case TypeCode.Byte:
+                    {
+                        var v = Convert.ToByte(value);
+                        return Unsafe.As<byte, T>(ref v);
+                    }
+                case TypeCode.Char:
+                    {
+                        var v = Convert.ToChar(value);
+                        return Unsafe.As<Char, T>(ref v);
+                    }
+
+                case TypeCode.Int16:
+                    {
+                        var v = Convert.ToInt16(value);
+                        return Unsafe.As<Int16, T>(ref v);
+                    }
+
+                case TypeCode.Int64:
+                    {
+                        var v = Convert.ToInt64(value);
+                        return Unsafe.As<Int64, T>(ref v);
+                    }
+
+                case TypeCode.SByte:
+                    {
+                        var v = Convert.ToSByte(value);
+                        return Unsafe.As<SByte, T>(ref v);
+                    }
+
+                case TypeCode.UInt16:
+                    {
+                        var v = Convert.ToUInt16(value);
+                        return Unsafe.As<UInt16, T>(ref v);
+                    }
+
+                case TypeCode.UInt32:
+                    {
+                        var v = Convert.ToUInt32(value);
+                        return Unsafe.As<UInt32, T>(ref v);
+                    }
+
+                case TypeCode.UInt64:
+                    {
+                        var v = Convert.ToUInt64(value);
+                        return Unsafe.As<UInt64, T>(ref v);
+                    }
+
+                default:
+                    throw new InvalidOperationException();
+            }
+        }
     }
 
     public class EnumInfo<T> : IEnumInfo<T> where T : struct, Enum
@@ -203,12 +376,13 @@ namespace SV
         private readonly (string Name, T Value)[] members;
         private readonly IReadOnlyDictionary<string, T> membersByName;
         private readonly IReadOnlyDictionary<T, string> namesByMember;
-        private readonly IEnumUnderlyingTypeInfo enumUnderlyingTypeInfo;
         private readonly Type underlyingType;
+        private readonly TypeCode underlyingTypeCode;
+
         public bool IsFlags { get; private set; }
         public bool IsEmpty => values.Length == 0;
 
-        public EnumInfo()
+        public EnumInfo() : base()
         {
             var t = typeof(T);
             names = Enum.GetNames(t);
@@ -217,7 +391,7 @@ namespace SV
             membersByName = members.ToFastReadOnlyDictionary(i => i.Name, i => i.Value);
             namesByMember = membersByName.AsEnumerable().DistinctBy(i => i.Value).ToFastReadOnlyDictionary(i => i.Value, i => i.Key);
             underlyingType = Enum.GetUnderlyingType(t);
-            enumUnderlyingTypeInfo = Enums.EnumUnderlyingTypeInfos[underlyingType];
+            underlyingTypeCode = Type.GetTypeCode(underlyingType);
             IsFlags = t.IsDefined(typeof(FlagsAttribute), true);
         }
 
@@ -242,7 +416,7 @@ namespace SV
             {
                 return true;
             }
-            if (enumUnderlyingTypeInfo.TryParse(name, out result))
+            if (Enums.TryParseUnderlyingTypeString<T>(underlyingTypeCode, name, out result))
                 return true;
             return false;
         }
@@ -251,7 +425,7 @@ namespace SV
         {
             if (membersByName.TryGetValue(name, out result))
                 return true;
-            if (enumUnderlyingTypeInfo.TryParse(name, out result))
+            if (Enums.TryParseUnderlyingTypeString<T>(underlyingTypeCode, name, out result))
                 return true;
             return false;
         }
@@ -272,6 +446,8 @@ namespace SV
         }
 
         public Type GetUnderlyingType() => underlyingType;
+
+        public TypeCode GetUnderlyingTypeCode() => underlyingTypeCode;
 
         public bool IsDefined(string name)
         {

@@ -169,6 +169,18 @@ namespace Benchmark
         {
             return test.IsDefined("Melon");
         }
+
+        [Benchmark(Baseline = true), BenchmarkCategory("ToEnumInt")]
+        public Fruits ToEnumInt()
+        {
+            return (Fruits)Enum.ToObject(typeof(Fruits), 11);
+        }
+
+        [Benchmark, BenchmarkCategory("ToEnumInt")]
+        public Fruits SVEnumsToEnumInt()
+        {
+            return Enums<Fruits>.ToEnum(11);
+        }
     }
 
     public class TestIEnumInfo : EnumBase<Fruits>
@@ -256,17 +268,6 @@ namespace Benchmark
                     result = default;
                     return false;
             }
-        }
-
-        protected override bool TryParseUnderlyingTypeString(string value, out Fruits result)
-        {
-            if (int.TryParse(value, out var numericResult))
-            {
-                result = (Fruits)numericResult;
-                return true;
-            }
-            result = default;
-            return false;
         }
     }
 }
