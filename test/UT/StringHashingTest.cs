@@ -7,7 +7,9 @@ namespace UT
         [Fact]
         public void NormalizedHash()
         {
+#pragma warning disable CS8602 // Dereference of a possibly null reference.
             var hash = typeof(string).GetMethod("GetNonRandomizedHashCodeOrdinalIgnoreCase", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance).CreateDelegate<Func<string, int>>();
+#pragma warning restore CS8602 // Dereference of a possibly null reference.
             Assert.Equal("   ".HashOrdinalIgnoreCase(), "   ".HashOrdinalIgnoreCase());
             Assert.Equal(" asds dsff".HashOrdinalIgnoreCase(), " ASDS dsff".HashOrdinalIgnoreCase());
             Assert.Equal(1666770079, " asds dsff".HashOrdinalIgnoreCase());

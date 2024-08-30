@@ -6,6 +6,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace SV
 {
@@ -35,6 +36,8 @@ namespace SV
         public bool TryParse(string name, out T result);
 
         Type GetUnderlyingType();
+
+        string GetName(T t);
     }
 
     public abstract class EnumBase<T> : IEnumInfo<T> where T : struct, Enum
@@ -52,7 +55,10 @@ namespace SV
         protected abstract bool TryParseIgnoreCase(in ReadOnlySpan<char> name, out T result);
 
         protected abstract bool TryParseCase(in ReadOnlySpan<char> name, out T result);
+
         protected abstract bool TryParseUnderlyingTypeString(string value, out T result);
+
+        public abstract string GetName(T t);
 
         public bool TryParse(string name, bool ignoreCase, out T result)
         {
@@ -79,10 +85,10 @@ namespace SV
 
     public static class Enums
     {
-        internal static readonly FrozenDictionary<Type, IEnumUnderlyingTypeInfo> EnumUnderlyingTypeInfos = new Dictionary<Type, IEnumUnderlyingTypeInfo>()
+        internal static readonly IReadOnlyDictionary<Type, IEnumUnderlyingTypeInfo> EnumUnderlyingTypeInfos = new FastReadOnlyDictionary<Type, IEnumUnderlyingTypeInfo>(new KeyValuePair<Type, IEnumUnderlyingTypeInfo>[]
         {
-            { typeof(int),  new Int32EnumUnderlyingTypeInfo() }
-        }.ToFrozenDictionary();
+            new KeyValuePair<Type, IEnumUnderlyingTypeInfo>(typeof(int),  new Int32EnumUnderlyingTypeInfo() )
+        });
 
 #if NETCOREAPP3_0_OR_GREATER
         internal const MethodImplOptions Optimization = MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization;
@@ -119,12 +125,18 @@ namespace SV
         {
             return CheckInfo().TryParse(name, out result);
         }
+
+        public static string GetName(T t)
+        {
+            return CheckInfo().GetName(t);
+        }
     }
 
     public class EnumInfo<T> : IEnumInfo<T> where T : struct, Enum
     {
         private readonly (string Name, T Value)[] members;
         private readonly IReadOnlyDictionary<string, T> membersByName;
+        private readonly IReadOnlyDictionary<T, string> namesByMember;
         private readonly IEnumUnderlyingTypeInfo enumUnderlyingTypeInfo;
         private readonly Type underlyingType;
 
@@ -133,7 +145,8 @@ namespace SV
             var t = typeof(T);
             var names = Enum.GetNames(t);
             members = names.Select(i => (i, (T)Enum.Parse(t, i))).ToArray();
-            membersByName = FastReadOnlyDictionary<string, T>.Create(members, i => i.Name, i => i.Value);
+            membersByName = members.ToFastReadOnlyDictionary(i => i.Name, i => i.Value);
+            namesByMember = membersByName.AsEnumerable().ToFastReadOnlyDictionary(i => i.Value, i => i.Key);
             underlyingType = Enum.GetUnderlyingType(t);
             enumUnderlyingTypeInfo = Enums.EnumUnderlyingTypeInfos[underlyingType];
         }
@@ -144,21 +157,6 @@ namespace SV
             foreach (var member in members.AsSpan())
             {
                 if (name.Equals(member.Name.AsSpan(), StringComparison.OrdinalIgnoreCase))
-                {
-                    result = member.Value;
-                    return true;
-                }
-            }
-            result = default;
-            return false;
-        }
-
-        [MethodImpl(Enums.Optimization)]
-        private bool TryParseInternal(in ReadOnlySpan<char> name, out T result)
-        {
-            foreach (var member in members.AsSpan())
-            {
-                if (name.Equals(member.Name.AsSpan(), StringComparison.Ordinal))
                 {
                     result = member.Value;
                     return true;
@@ -183,13 +181,14 @@ namespace SV
         {
             if (membersByName.TryGetValue(name, out result))
                 return true;
-            //if (TryParseInternal(name.AsSpan(), out result))
-            //{
-            //    return true;
-            //}
             if (enumUnderlyingTypeInfo.TryParse(name, out result))
                 return true;
             return false;
+        }
+
+        public string GetName(T t)
+        {
+            return namesByMember.TryGetValue(t, out var name) ? name : null;
         }
 
         public Type GetUnderlyingType() => underlyingType;

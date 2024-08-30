@@ -8,8 +8,6 @@ using System.Runtime.CompilerServices;
 
 namespace SV;
 
-
-
 // note:
 //  - I really don't want to make my own custom dictionary.
 //  - However, this is faster than FrozonDictionary<TKey, TValue>, so I have no choice but to prepare it.
@@ -27,25 +25,43 @@ public sealed class FastReadOnlyDictionary<TKey, TValue> : IReadOnlyDictionary<T
      where TKey : notnull
 {
     #region Fields
+
     private Entry[] _buckets;
     private int _size;
     private readonly float _loadFactor;
-    #endregion
 
+    #endregion Fields
 
     #region Constructors
+
     private FastReadOnlyDictionary(int bucketSize, float loadFactor)
     {
         this._buckets = (bucketSize is 0) ? [] : new Entry[bucketSize];
         this._loadFactor = loadFactor;
     }
-    #endregion
 
+    public FastReadOnlyDictionary(IEnumerable<KeyValuePair<TKey, TValue>> source)
+    {
+        const int initialSize = 4;
+        const float loadFactor = 0.75f;
+        var size = source.TryGetNonEnumeratedCount(out var count) ? count : initialSize;
+        var bucketSize = CalculateCapacity(size, loadFactor);
+        this._buckets = (bucketSize is 0) ? [] : new Entry[bucketSize];
+        this._loadFactor = loadFactor;
+
+        foreach (var x in source)
+        {
+            if (!this.TryAddInternal(x.Key, x.Value, out _))
+                throw new ArgumentException($"Key was already exists. Key:{x.Key}");
+        }
+    }
+
+    #endregion Constructors
 
     #region Factories
+
     public static FastReadOnlyDictionary<TKey, TValue> Create(IEnumerable<TValue> source, Func<TValue, TKey> keySelector)
         => Create(source, keySelector, valueSelector: static x => x);
-
 
     public static FastReadOnlyDictionary<TKey, TValue> Create<TSource>(IEnumerable<TSource> source, Func<TSource, TKey> keySelector, Func<TSource, TValue> valueSelector)
     {
@@ -65,10 +81,11 @@ public sealed class FastReadOnlyDictionary<TKey, TValue> : IReadOnlyDictionary<T
 
         return result;
     }
-    #endregion
 
+    #endregion Factories
 
     #region Add
+
     private bool TryAddInternal(TKey key, TValue value, out TValue resultingValue)
     {
         var nextCapacity = CalculateCapacity(this._size + 1, this._loadFactor);
@@ -103,8 +120,8 @@ public sealed class FastReadOnlyDictionary<TKey, TValue> : IReadOnlyDictionary<T
             return success;
         }
 
-
         #region Local Functions
+
         //--- please pass 'key + newEntry' or 'key + value'.
         static bool addToBuckets(Entry[] buckets, TKey newKey, Entry newEntry, TValue value, out TValue resultingValue)
         {
@@ -154,9 +171,9 @@ public sealed class FastReadOnlyDictionary<TKey, TValue> : IReadOnlyDictionary<T
             }
             return true;
         }
-        #endregion
-    }
 
+        #endregion Local Functions
+    }
 
     private static int CalculateCapacity(int collectionSize, float loadFactor)
     {
@@ -170,39 +187,29 @@ public sealed class FastReadOnlyDictionary<TKey, TValue> : IReadOnlyDictionary<T
 
         return capacity;
     }
-    #endregion
 
+    #endregion Add
 
     #region IReadOnlyDictionary<TKey, TValue>
-    
+
     public TValue this[TKey key]
         => this.TryGetValue(key, out var value)
         ? value
         : throw new KeyNotFoundException();
 
-
-    
     public IEnumerable<TKey> Keys
-        => throw new NotImplementedException();
+        => AllKV().Select(i => i.Key);
 
-
-    
     public IEnumerable<TValue> Values
-        => throw new NotImplementedException();
+        => AllKV().Select(i => i.Value);
 
-
-    
     public int Count
         => this._size;
 
-
-    
     [MethodImpl(Enums.Optimization)]
     public bool ContainsKey(TKey key)
         => this.TryGetValue(key, out _);
 
-
-    
     [MethodImpl(Enums.Optimization)]
     public bool TryGetValue(TKey key, out TValue value)
     {
@@ -222,19 +229,32 @@ public sealed class FastReadOnlyDictionary<TKey, TValue> : IReadOnlyDictionary<T
         return false;
     }
 
-
-    
     public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator()
-        => throw new NotImplementedException();
+        => AllKV().GetEnumerator();
 
-
-    
     IEnumerator IEnumerable.GetEnumerator()
-        => throw new NotImplementedException();
-    #endregion
+        => AllKV().GetEnumerator();
 
+    public IEnumerable<KeyValuePair<TKey, TValue>> AllKV()
+    {
+        if (_buckets != null)
+        {
+            foreach (var item in _buckets)
+            {
+                var next = item;
+                while (next is not null)
+                {
+                    yield return new KeyValuePair<TKey, TValue>(next.Key, next.Value);
+                    next = next.Next;
+                }
+            }
+        }
+    }
+
+    #endregion IReadOnlyDictionary<TKey, TValue>
 
     #region Inner Classes
+
     private sealed class Entry(TKey key, TValue value, int hash)
     {
         public readonly TKey Key = key;
@@ -242,5 +262,6 @@ public sealed class FastReadOnlyDictionary<TKey, TValue> : IReadOnlyDictionary<T
         public readonly int Hash = hash;
         public Entry Next;
     }
-    #endregion
+
+    #endregion Inner Classes
 }
