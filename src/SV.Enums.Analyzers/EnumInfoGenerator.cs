@@ -36,7 +36,7 @@ using System.ComponentModel;
 namespace SV
 {{
 
-//#if NET5_0_OR_GREATER
+#if NET5_0_OR_GREATER
 
     {string.Join("\r\n", es.Select(i => i.Content))}
     internal static partial class Enums{Guid.NewGuid().ToString("N").ToUpper()}
@@ -47,8 +47,8 @@ namespace SV
             {string.Join("\r\n", es.Select(i => i.Set))}
         }}
     }}
-//#else
-//#endif
+#else
+#endif
 }}
             ";
 
