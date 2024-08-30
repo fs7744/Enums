@@ -10,6 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using SV;
+using System.Collections.Immutable;
 
 namespace Benchmark
 {
@@ -107,6 +108,42 @@ namespace Benchmark
         public string? EnumInfoGetName()
         {
             return test.GetName(Fruits.Lemon);
+        }
+
+        [Benchmark(Baseline = true), BenchmarkCategory("GetNames")]
+        public string[] GetNames()
+        {
+            return Enum.GetNames<Fruits>();
+        }
+
+        [Benchmark, BenchmarkCategory("GetNames")]
+        public IReadOnlyList<string> FastEnumGetNames()
+        {
+            return FastEnum.GetNames<Fruits>();
+        }
+
+        [Benchmark, BenchmarkCategory("GetNames")]
+        public ImmutableArray<string> SVEnumsGetNames()
+        {
+            return Enums<Fruits>.GetNames();
+        }
+
+        [Benchmark(Baseline = true), BenchmarkCategory("GetValues")]
+        public Fruits[] GetValues()
+        {
+            return Enum.GetValues<Fruits>();
+        }
+
+        [Benchmark, BenchmarkCategory("GetValues")]
+        public IReadOnlyList<Fruits> FastEnumGetValues()
+        {
+            return FastEnum.GetValues<Fruits>();
+        }
+
+        [Benchmark, BenchmarkCategory("GetValues")]
+        public ImmutableArray<Fruits> SVEnumsGetValues()
+        {
+            return Enums<Fruits>.GetValues();
         }
     }
 

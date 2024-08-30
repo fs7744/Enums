@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Frozen;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Data;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
@@ -38,16 +41,24 @@ namespace SV
         Type GetUnderlyingType();
 
         string GetName(T t);
+
+        ImmutableArray<string> GetNames();
+
+        ImmutableArray<T> GetValues();
     }
 
     public abstract class EnumBase<T> : IEnumInfo<T> where T : struct, Enum
     {
         private readonly Type underlyingType;
+        private string[] names;
+        private readonly T[] values;
 
         public EnumBase()
         {
             var t = typeof(T);
             underlyingType = Enum.GetUnderlyingType(t);
+            names = Enum.GetNames(t);
+            values = names.Select(i => (T)Enum.Parse(t, i)).ToArray();
         }
 
         public Type GetUnderlyingType() => underlyingType;
@@ -59,6 +70,16 @@ namespace SV
         protected abstract bool TryParseUnderlyingTypeString(string value, out T result);
 
         public abstract string GetName(T t);
+
+        public ImmutableArray<string> GetNames()
+        {
+            return ImmutableCollectionsMarshal.AsImmutableArray(names);
+        }
+
+        public ImmutableArray<T> GetValues()
+        {
+            return ImmutableCollectionsMarshal.AsImmutableArray(values);
+        }
 
         public bool TryParse(string name, bool ignoreCase, out T result)
         {
@@ -130,10 +151,22 @@ namespace SV
         {
             return CheckInfo().GetName(t);
         }
+
+        public static ImmutableArray<string> GetNames()
+        {
+            return CheckInfo().GetNames();
+        }
+
+        public static ImmutableArray<T> GetValues()
+        {
+            return CheckInfo().GetValues();
+        }
     }
 
     public class EnumInfo<T> : IEnumInfo<T> where T : struct, Enum
     {
+        private readonly string[] names;
+        private readonly T[] values;
         private readonly (string Name, T Value)[] members;
         private readonly IReadOnlyDictionary<string, T> membersByName;
         private readonly IReadOnlyDictionary<T, string> namesByMember;
@@ -143,8 +176,9 @@ namespace SV
         public EnumInfo()
         {
             var t = typeof(T);
-            var names = Enum.GetNames(t);
+            names = Enum.GetNames(t);
             members = names.Select(i => (i, (T)Enum.Parse(t, i))).ToArray();
+            values = members.Select(i => i.Value).ToArray();
             membersByName = members.ToFastReadOnlyDictionary(i => i.Name, i => i.Value);
             namesByMember = membersByName.AsEnumerable().ToFastReadOnlyDictionary(i => i.Value, i => i.Key);
             underlyingType = Enum.GetUnderlyingType(t);
@@ -189,6 +223,16 @@ namespace SV
         public string GetName(T t)
         {
             return namesByMember.TryGetValue(t, out var name) ? name : null;
+        }
+
+        public ImmutableArray<string> GetNames()
+        {
+            return ImmutableCollectionsMarshal.AsImmutableArray(names);
+        }
+
+        public ImmutableArray<T> GetValues()
+        {
+            return ImmutableCollectionsMarshal.AsImmutableArray(values);
         }
 
         public Type GetUnderlyingType() => underlyingType;
