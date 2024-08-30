@@ -4,8 +4,11 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Data;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Formatters;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
@@ -31,6 +34,12 @@ namespace SV
 
         bool IsDefined(string name);
 
+        EnumMemberAttribute GetEnumMember(T t);
+
+        IReadOnlyDictionary<int, string> GetLabels(T t);
+
+        string GetLabel(T t, int index);
+
         bool IsFlags { get; }
 
         bool IsEmpty { get; }
@@ -42,6 +51,7 @@ namespace SV
         protected readonly TypeCode underlyingTypeCode;
         private string[] names;
         private readonly T[] values;
+        private readonly IReadOnlyDictionary<T, (string Name, EnumMemberAttribute Member, IReadOnlyDictionary<int, string> Labels)> namesByMember;
         public bool IsFlags { get; private set; }
         public bool IsEmpty => values.Length == 0;
 
@@ -53,6 +63,11 @@ namespace SV
             names = Enum.GetNames(t);
             values = names.Select(i => (T)Enum.Parse(t, i)).ToArray();
             IsFlags = t.IsDefined(typeof(FlagsAttribute), true);
+            namesByMember = names.Select(i => (Key: i, Value: (T)Enum.Parse(t, i))).DistinctBy(i => i.Value).AsEnumerable().DistinctBy(i => i.Value).ToFastReadOnlyDictionary(i => i.Value, i =>
+            {
+                var fieldInfo = t.GetField(i.Key)!;
+                return (i.Key, fieldInfo.GetCustomAttribute<EnumMemberAttribute>(), fieldInfo.GetCustomAttributes<LabelAttribute>().ToFastReadOnlyDictionary(x => x.Index, x => x.Value));
+            });
         }
 
         public Type GetUnderlyingType() => underlyingType;
@@ -66,6 +81,21 @@ namespace SV
         public abstract string GetName(T t);
 
         public abstract bool IsDefined(string name);
+
+        public EnumMemberAttribute GetEnumMember(T t)
+        {
+            return namesByMember.TryGetValue(t, out var r) ? r.Member : null;
+        }
+
+        public IReadOnlyDictionary<int, string> GetLabels(T t)
+        {
+            return namesByMember.TryGetValue(t, out var r) ? r.Labels : null;
+        }
+
+        public string GetLabel(T t, int index)
+        {
+            return namesByMember.TryGetValue(t, out var r) && r.Labels.TryGetValue(index, out var rr) ? rr : null;
+        }
 
         public ImmutableArray<string> GetNames()
         {
@@ -308,6 +338,21 @@ namespace SV
         public static Type GetUnderlyingType() => CheckInfo().GetUnderlyingType();
 
         public static TypeCode GetUnderlyingTypeCode() => CheckInfo().GetUnderlyingTypeCode();
+
+        public static EnumMemberAttribute GetEnumMember(T t)
+        {
+            return CheckInfo().GetEnumMember(t);
+        }
+
+        public static IReadOnlyDictionary<int, string> GetLabels(T t)
+        {
+            return CheckInfo().GetLabels(t);
+        }
+
+        public static string GetLabel(T t, int index)
+        {
+            return CheckInfo().GetLabel(t, index);
+        }
 
         public static T ToEnum(int value)
         {
@@ -1065,7 +1110,7 @@ namespace SV
         private readonly T[] values;
         private readonly (string Name, T Value)[] members;
         private readonly IReadOnlyDictionary<string, T> membersByName;
-        private readonly IReadOnlyDictionary<T, string> namesByMember;
+        private readonly IReadOnlyDictionary<T, (string Name, EnumMemberAttribute Member, IReadOnlyDictionary<int, string> Labels)> namesByMember;
         private readonly Type underlyingType;
         private readonly TypeCode underlyingTypeCode;
 
@@ -1079,7 +1124,11 @@ namespace SV
             members = names.Select(i => (i, (T)Enum.Parse(t, i))).ToArray();
             values = members.Select(i => i.Value).ToArray();
             membersByName = members.ToFastReadOnlyDictionary(i => i.Name, i => i.Value);
-            namesByMember = membersByName.AsEnumerable().DistinctBy(i => i.Value).ToFastReadOnlyDictionary(i => i.Value, i => i.Key);
+            namesByMember = membersByName.AsEnumerable().DistinctBy(i => i.Value).ToFastReadOnlyDictionary(i => i.Value, i =>
+            {
+                var fieldInfo = t.GetField(i.Key)!;
+                return (i.Key, fieldInfo.GetCustomAttribute<EnumMemberAttribute>(), fieldInfo.GetCustomAttributes<LabelAttribute>().ToFastReadOnlyDictionary(x => x.Index, x => x.Value));
+            });
             underlyingType = Enum.GetUnderlyingType(t);
             underlyingTypeCode = Type.GetTypeCode(underlyingType);
             IsFlags = t.IsDefined(typeof(FlagsAttribute), true);
@@ -1122,7 +1171,22 @@ namespace SV
 
         public string GetName(T t)
         {
-            return namesByMember.TryGetValue(t, out var name) ? name : null;
+            return namesByMember.TryGetValue(t, out var r) ? r.Name : null;
+        }
+
+        public EnumMemberAttribute GetEnumMember(T t)
+        {
+            return namesByMember.TryGetValue(t, out var r) ? r.Member : null;
+        }
+
+        public IReadOnlyDictionary<int, string> GetLabels(T t)
+        {
+            return namesByMember.TryGetValue(t, out var r) ? r.Labels : null;
+        }
+
+        public string GetLabel(T t, int index)
+        {
+            return namesByMember.TryGetValue(t, out var r) && r.Labels.TryGetValue(index, out var rr) ? rr : null;
         }
 
         public ImmutableArray<string> GetNames()
