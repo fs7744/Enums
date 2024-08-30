@@ -66,7 +66,7 @@ namespace SV
             namesByMember = names.Select(i => (Key: i, Value: (T)Enum.Parse(t, i))).DistinctBy(i => i.Value).AsEnumerable().DistinctBy(i => i.Value).ToFastReadOnlyDictionary(i => i.Value, i =>
             {
                 var fieldInfo = t.GetField(i.Key)!;
-                return (i.Key, fieldInfo.GetCustomAttribute<EnumMemberAttribute>(), fieldInfo.GetCustomAttributes<LabelAttribute>().ToFastReadOnlyDictionary(x => x.Index, x => x.Value));
+                return (i.Key, fieldInfo.GetCustomAttribute<EnumMemberAttribute>(), fieldInfo.GetCustomAttributes<LabelAttribute>().DistinctBy(i => i.Index).ToFastReadOnlyDictionary(x => x.Index, x => x.Value));
             });
         }
 
@@ -1127,7 +1127,7 @@ namespace SV
             namesByMember = membersByName.AsEnumerable().DistinctBy(i => i.Value).ToFastReadOnlyDictionary(i => i.Value, i =>
             {
                 var fieldInfo = t.GetField(i.Key)!;
-                return (i.Key, fieldInfo.GetCustomAttribute<EnumMemberAttribute>(), fieldInfo.GetCustomAttributes<LabelAttribute>().ToFastReadOnlyDictionary(x => x.Index, x => x.Value));
+                return (i.Key, fieldInfo.GetCustomAttribute<EnumMemberAttribute>(), fieldInfo.GetCustomAttributes<LabelAttribute>().DistinctBy(i => i.Index).ToFastReadOnlyDictionary(x => x.Index, x => x.Value));
             });
             underlyingType = Enum.GetUnderlyingType(t);
             underlyingTypeCode = Type.GetTypeCode(underlyingType);
