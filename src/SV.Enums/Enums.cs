@@ -51,7 +51,7 @@ namespace SV
         protected readonly TypeCode underlyingTypeCode;
         private string[] names;
         private readonly T[] values;
-        private readonly IReadOnlyDictionary<T, (string Name, EnumMemberAttribute Member, IReadOnlyDictionary<int, string> Labels)> namesByMember;
+        private readonly FastReadOnlyDictionary<T, (string Name, EnumMemberAttribute Member, FastReadOnlyDictionary<int, string> Labels)> namesByMember;
         public bool IsFlags { get; private set; }
         public bool IsEmpty => values.Length == 0;
 
@@ -130,7 +130,7 @@ namespace SV
         }
     }
 
-    public static class Enums
+    public static partial class Enums
     {
 #if NETCOREAPP3_0_OR_GREATER
         internal const MethodImplOptions Optimization = MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization;
@@ -1109,8 +1109,8 @@ namespace SV
         private readonly string[] names;
         private readonly T[] values;
         private readonly (string Name, T Value)[] members;
-        private readonly IReadOnlyDictionary<string, T> membersByName;
-        private readonly IReadOnlyDictionary<T, (string Name, EnumMemberAttribute Member, IReadOnlyDictionary<int, string> Labels)> namesByMember;
+        private readonly FastReadOnlyDictionary<string, T> membersByName;
+        private readonly FastReadOnlyDictionary<T, (string Name, EnumMemberAttribute Member, FastReadOnlyDictionary<int, string> Labels)> namesByMember;
         private readonly Type underlyingType;
         private readonly TypeCode underlyingTypeCode;
 
@@ -1169,6 +1169,7 @@ namespace SV
             return false;
         }
 
+        [MethodImpl(Enums.Optimization)]
         public string GetName(T t)
         {
             return namesByMember.TryGetValue(t, out var r) ? r.Name : null;

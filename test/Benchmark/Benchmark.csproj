@@ -6,6 +6,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
 	<EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+	<CompilerGeneratedFilesOutputPath>Generated</CompilerGeneratedFilesOutputPath>
   </PropertyGroup>
 
 	<ItemGroup>
@@ -24,6 +25,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <ProjectReference Include="..\..\src\SV.Enums.Analyzers\SV.Enums.Analyzers.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="true" />
 	  <ProjectReference Include="..\..\src\SV.Enums\SV.Enums.csproj" />
 	</ItemGroup>
 

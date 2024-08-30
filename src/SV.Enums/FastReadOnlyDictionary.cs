@@ -28,26 +28,19 @@ public sealed class FastReadOnlyDictionary<TKey, TValue> : IReadOnlyDictionary<T
 
     private Entry[] _buckets;
     private int _size;
-    private readonly float _loadFactor;
+    const float _loadFactor = 0.75f;
+    const int initialSize = 4;
+    private static readonly IEqualityComparer<TKey> comparer = EqualityComparer<TKey>.Default;
 
     #endregion Fields
 
     #region Constructors
 
-    private FastReadOnlyDictionary(int bucketSize, float loadFactor)
-    {
-        this._buckets = (bucketSize is 0) ? [] : new Entry[bucketSize];
-        this._loadFactor = loadFactor;
-    }
-
     public FastReadOnlyDictionary(IEnumerable<KeyValuePair<TKey, TValue>> source)
     {
-        const int initialSize = 4;
-        const float loadFactor = 0.75f;
         var size = source.TryGetNonEnumeratedCount(out var count) ? count : initialSize;
-        var bucketSize = CalculateCapacity(size, loadFactor);
+        var bucketSize = CalculateCapacity(size, _loadFactor);
         this._buckets = (bucketSize is 0) ? [] : new Entry[bucketSize];
-        this._loadFactor = loadFactor;
 
         foreach (var x in source)
         {
@@ -58,37 +51,11 @@ public sealed class FastReadOnlyDictionary<TKey, TValue> : IReadOnlyDictionary<T
 
     #endregion Constructors
 
-    #region Factories
-
-    public static FastReadOnlyDictionary<TKey, TValue> Create(IEnumerable<TValue> source, Func<TValue, TKey> keySelector)
-        => Create(source, keySelector, valueSelector: static x => x);
-
-    public static FastReadOnlyDictionary<TKey, TValue> Create<TSource>(IEnumerable<TSource> source, Func<TSource, TKey> keySelector, Func<TSource, TValue> valueSelector)
-    {
-        const int initialSize = 4;
-        const float loadFactor = 0.75f;
-        var size = source.TryGetNonEnumeratedCount(out var count) ? count : initialSize;
-        var bucketSize = CalculateCapacity(size, loadFactor);
-        var result = new FastReadOnlyDictionary<TKey, TValue>(bucketSize, loadFactor);
-
-        foreach (var x in source)
-        {
-            var key = keySelector(x);
-            var value = valueSelector(x);
-            if (!result.TryAddInternal(key, value, out _))
-                throw new ArgumentException($"Key was already exists. Key:{key}");
-        }
-
-        return result;
-    }
-
-    #endregion Factories
-
     #region Add
 
     private bool TryAddInternal(TKey key, TValue value, out TValue resultingValue)
     {
-        var nextCapacity = CalculateCapacity(this._size + 1, this._loadFactor);
+        var nextCapacity = CalculateCapacity(this._size + 1, _loadFactor);
         if (this._buckets.Length < nextCapacity)
         {
             //--- rehash
@@ -123,9 +90,9 @@ public sealed class FastReadOnlyDictionary<TKey, TValue> : IReadOnlyDictionary<T
         #region Local Functions
 
         //--- please pass 'key + newEntry' or 'key + value'.
-        static bool addToBuckets(Entry[] buckets, TKey newKey, Entry newEntry, TValue value, out TValue resultingValue)
+        bool addToBuckets(Entry[] buckets, TKey newKey, Entry newEntry, TValue value, out TValue resultingValue)
         {
-            var hash = newEntry?.Hash ?? EqualityComparer<TKey>.Default.GetHashCode(newKey);
+            var hash = newEntry?.Hash ?? comparer.GetHashCode(newKey);
             var index = hash & (buckets.Length - 1);
             if (buckets[index] is null)
             {
@@ -145,7 +112,7 @@ public sealed class FastReadOnlyDictionary<TKey, TValue> : IReadOnlyDictionary<T
                 var lastEntry = buckets[index];
                 while (true)
                 {
-                    if (EqualityComparer<TKey>.Default.Equals(lastEntry.Key, newKey))
+                    if (comparer.Equals(lastEntry.Key, newKey))
                     {
                         resultingValue = lastEntry.Value;
                         return false;
@@ -213,12 +180,12 @@ public sealed class FastReadOnlyDictionary<TKey, TValue> : IReadOnlyDictionary<T
     [MethodImpl(Enums.Optimization)]
     public bool TryGetValue(TKey key, out TValue value)
     {
-        var hash = EqualityComparer<TKey>.Default.GetHashCode(key);
+        var hash = comparer.GetHashCode(key);
         var index = hash & (this._buckets.Length - 1);
         var next = this._buckets[index];
         while (next is not null)
         {
-            if (EqualityComparer<TKey>.Default.Equals(next.Key, key))
+            if (comparer.Equals(next.Key, key))
             {
                 value = next.Value!;
                 return true;

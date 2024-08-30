@@ -31,7 +31,7 @@ namespace Benchmark
         public EnumBenchmarks()
         {
             test = new EnumInfo<Fruits>();
-            Enums.SetEnumInfo<Fruits>(new TestIEnumInfo());
+            //Enums.SetEnumInfo<Fruits>(new TestIEnumInfo());
         }
 
         [Benchmark(Baseline = true), BenchmarkCategory("IgnoreCase")]
@@ -107,6 +107,7 @@ namespace Benchmark
         [Benchmark, BenchmarkCategory("GetName")]
         public string? EnumInfoGetName()
         {
+            //var a = FastEnum.IsContinuous<Fruits>();
             return test.GetName(Fruits.Lemon);
         }
 
@@ -179,7 +180,7 @@ namespace Benchmark
         public ToEnumBenchmarks()
         {
             test = new EnumInfo<Fruits>();
-            Enums.SetEnumInfo<Fruits>(new TestIEnumInfo());
+            //Enums.SetEnumInfo<Fruits>(new TestIEnumInfo());
         }
 
         [Benchmark(Baseline = true), BenchmarkCategory("ToEnumInt")]
@@ -219,91 +220,91 @@ namespace Benchmark
         }
     }
 
-    public class TestIEnumInfo : EnumBase<Fruits>
-    {
-        public override bool IsDefined(string name)
-        {
-            return name switch
-            {
-                nameof(global::Benchmark.Fruits.Apple) => true,
-                nameof(global::Benchmark.Fruits.Lemon) => true,
-                nameof(global::Benchmark.Fruits.Melon) => true,
-                nameof(global::Benchmark.Fruits.Banana) => true,
-                _ => false,
-            };
-        }
+    //public class TestIEnumInfo : EnumBase<Fruits>
+    //{
+    //    public override bool IsDefined(string name)
+    //    {
+    //        return name switch
+    //        {
+    //            nameof(global::Benchmark.Fruits.Apple) => true,
+    //            nameof(global::Benchmark.Fruits.Lemon) => true,
+    //            nameof(global::Benchmark.Fruits.Melon) => true,
+    //            nameof(global::Benchmark.Fruits.Banana) => true,
+    //            _ => false,
+    //        };
+    //    }
 
-        public override string? GetName(Fruits t)
-        {
-            switch (t)
-            {
-                case Fruits.Apple:
-                    return nameof(Fruits.Apple);
+    //    public override string? GetName(Fruits t)
+    //    {
+    //        switch (t)
+    //        {
+    //            case Fruits.Apple:
+    //                return nameof(Fruits.Apple);
 
-                case Fruits.Lemon:
-                    return nameof(Fruits.Lemon);
+    //            case Fruits.Lemon:
+    //                return nameof(Fruits.Lemon);
 
-                case Fruits.Melon:
-                    return nameof(Fruits.Melon);
+    //            case Fruits.Melon:
+    //                return nameof(Fruits.Melon);
 
-                case Fruits.Banana:
-                    return nameof(Fruits.Banana);
+    //            case Fruits.Banana:
+    //                return nameof(Fruits.Banana);
 
-                default:
-                    return null;
-            }
-        }
+    //            default:
+    //                return null;
+    //        }
+    //    }
 
-        protected override bool TryParseCase(in ReadOnlySpan<char> name, out Fruits result)
-        {
-            switch (name)
-            {
-                case ReadOnlySpan<char> current when current.Equals(nameof(global::Benchmark.Fruits.Apple).AsSpan(), global::System.StringComparison.Ordinal):
-                    result = global::Benchmark.Fruits.Apple;
-                    return true;
+    //    protected override bool TryParseCase(in ReadOnlySpan<char> name, out Fruits result)
+    //    {
+    //        switch (name)
+    //        {
+    //            case ReadOnlySpan<char> current when current.Equals(nameof(global::Benchmark.Fruits.Apple).AsSpan(), global::System.StringComparison.Ordinal):
+    //                result = global::Benchmark.Fruits.Apple;
+    //                return true;
 
-                case ReadOnlySpan<char> current when current.Equals(nameof(global::Benchmark.Fruits.Lemon).AsSpan(), global::System.StringComparison.Ordinal):
-                    result = global::Benchmark.Fruits.Lemon;
-                    return true;
+    //            case ReadOnlySpan<char> current when current.Equals(nameof(global::Benchmark.Fruits.Lemon).AsSpan(), global::System.StringComparison.Ordinal):
+    //                result = global::Benchmark.Fruits.Lemon;
+    //                return true;
 
-                case ReadOnlySpan<char> current when current.Equals(nameof(global::Benchmark.Fruits.Melon).AsSpan(), global::System.StringComparison.Ordinal):
-                    result = global::Benchmark.Fruits.Melon;
-                    return true;
+    //            case ReadOnlySpan<char> current when current.Equals(nameof(global::Benchmark.Fruits.Melon).AsSpan(), global::System.StringComparison.Ordinal):
+    //                result = global::Benchmark.Fruits.Melon;
+    //                return true;
 
-                case ReadOnlySpan<char> current when current.Equals(nameof(global::Benchmark.Fruits.Banana).AsSpan(), global::System.StringComparison.Ordinal):
-                    result = global::Benchmark.Fruits.Banana;
-                    return true;
+    //            case ReadOnlySpan<char> current when current.Equals(nameof(global::Benchmark.Fruits.Banana).AsSpan(), global::System.StringComparison.Ordinal):
+    //                result = global::Benchmark.Fruits.Banana;
+    //                return true;
 
-                default:
-                    result = default;
-                    return false;
-            }
-        }
+    //            default:
+    //                result = default;
+    //                return false;
+    //        }
+    //    }
 
-        protected override bool TryParseIgnoreCase(in ReadOnlySpan<char> name, out Fruits result)
-        {
-            switch (name)
-            {
-                case ReadOnlySpan<char> current when current.Equals(nameof(global::Benchmark.Fruits.Apple).AsSpan(), global::System.StringComparison.OrdinalIgnoreCase):
-                    result = global::Benchmark.Fruits.Apple;
-                    return true;
+    //    protected override bool TryParseIgnoreCase(in ReadOnlySpan<char> name, out Fruits result)
+    //    {
+    //        switch (name)
+    //        {
+    //            case ReadOnlySpan<char> current when current.Equals(nameof(global::Benchmark.Fruits.Apple).AsSpan(), global::System.StringComparison.OrdinalIgnoreCase):
+    //                result = global::Benchmark.Fruits.Apple;
+    //                return true;
 
-                case ReadOnlySpan<char> current when current.Equals(nameof(global::Benchmark.Fruits.Lemon).AsSpan(), global::System.StringComparison.OrdinalIgnoreCase):
-                    result = global::Benchmark.Fruits.Lemon;
-                    return true;
+    //            case ReadOnlySpan<char> current when current.Equals(nameof(global::Benchmark.Fruits.Lemon).AsSpan(), global::System.StringComparison.OrdinalIgnoreCase):
+    //                result = global::Benchmark.Fruits.Lemon;
+    //                return true;
 
-                case ReadOnlySpan<char> current when current.Equals(nameof(global::Benchmark.Fruits.Melon).AsSpan(), global::System.StringComparison.OrdinalIgnoreCase):
-                    result = global::Benchmark.Fruits.Melon;
-                    return true;
+    //            case ReadOnlySpan<char> current when current.Equals(nameof(global::Benchmark.Fruits.Melon).AsSpan(), global::System.StringComparison.OrdinalIgnoreCase):
+    //                result = global::Benchmark.Fruits.Melon;
+    //                return true;
 
-                case ReadOnlySpan<char> current when current.Equals(nameof(global::Benchmark.Fruits.Banana).AsSpan(), global::System.StringComparison.OrdinalIgnoreCase):
-                    result = global::Benchmark.Fruits.Banana;
-                    return true;
+    //            case ReadOnlySpan<char> current when current.Equals(nameof(global::Benchmark.Fruits.Banana).AsSpan(), global::System.StringComparison.OrdinalIgnoreCase):
+    //                result = global::Benchmark.Fruits.Banana;
+    //                return true;
 
-                default:
-                    result = default;
-                    return false;
-            }
-        }
-    }
+    //            default:
+    //                result = default;
+    //                return false;
+    //        }
+    //    }
+    //}
 }

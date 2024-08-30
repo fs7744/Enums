@@ -174,7 +174,7 @@ namespace System.Linq
             return EmptyAsyncEnumerator<TValue>.Instance;
         }
 
-        public static IReadOnlyDictionary<TKey, TValue> ToFastReadOnlyDictionary<TSource, TKey, TValue>(this IEnumerable<TSource> source, Func<TSource, TKey> keySelector, Func<TSource, TValue> valueSelector)
+        public static FastReadOnlyDictionary<TKey, TValue> ToFastReadOnlyDictionary<TSource, TKey, TValue>(this IEnumerable<TSource> source, Func<TSource, TKey> keySelector, Func<TSource, TValue> valueSelector)
         {
             return new FastReadOnlyDictionary<TKey, TValue>(source.Select(i => new KeyValuePair<TKey, TValue>(keySelector(i), valueSelector(i))));
         }
