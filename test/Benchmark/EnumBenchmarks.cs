@@ -169,6 +169,18 @@ namespace Benchmark
         {
             return test.IsDefined("Melon");
         }
+    }
+
+    [MemoryDiagnoser, Orderer(summaryOrderPolicy: SummaryOrderPolicy.FastestToSlowest), GroupBenchmarksBy(BenchmarkLogicalGroupRule.ByCategory), CategoriesColumn]
+    public class ToEnumBenchmarks
+    {
+        private readonly EnumInfo<Fruits> test;
+
+        public ToEnumBenchmarks()
+        {
+            test = new EnumInfo<Fruits>();
+            Enums.SetEnumInfo<Fruits>(new TestIEnumInfo());
+        }
 
         [Benchmark(Baseline = true), BenchmarkCategory("ToEnumInt")]
         public Fruits ToEnumInt()
@@ -180,6 +192,30 @@ namespace Benchmark
         public Fruits SVEnumsToEnumInt()
         {
             return Enums<Fruits>.ToEnum(11);
+        }
+
+        [Benchmark, BenchmarkCategory("ToEnumInt")]
+        public Fruits ToEnumIntByte()
+        {
+            return (Fruits)Enum.ToObject(typeof(Fruits), (byte)11);
+        }
+
+        [Benchmark, BenchmarkCategory("ToEnumInt")]
+        public Fruits SVEnumsToEnumIntByte()
+        {
+            return Enums<Fruits>.ToEnum((byte)11);
+        }
+
+        [Benchmark, BenchmarkCategory("ToEnumInt")]
+        public Fruits ToEnumIntObject()
+        {
+            return (Fruits)Enum.ToObject(typeof(Fruits), (object)11);
+        }
+
+        [Benchmark, BenchmarkCategory("ToEnumInt")]
+        public Fruits SVEnumsToEnumIntObject()
+        {
+            return Enums<Fruits>.ToEnum((object)11);
         }
     }
 

@@ -367,6 +367,630 @@ namespace SV
                     throw new InvalidOperationException();
             }
         }
+
+        public static T ToEnum(byte value)
+        {
+            switch (GetUnderlyingTypeCode())
+            {
+                case TypeCode.Int32:
+                    {
+                        var v = Convert.ToInt32(value);
+                        return Unsafe.As<Int32, T>(ref v);
+                    }
+
+                case TypeCode.Byte:
+                    return Unsafe.As<byte, T>(ref value);
+
+                case TypeCode.Char:
+                    {
+                        var v = Convert.ToChar(value);
+                        return Unsafe.As<Char, T>(ref v);
+                    }
+
+                case TypeCode.Int16:
+                    {
+                        var v = Convert.ToInt16(value);
+                        return Unsafe.As<Int16, T>(ref v);
+                    }
+
+                case TypeCode.Int64:
+                    {
+                        var v = Convert.ToInt64(value);
+                        return Unsafe.As<Int64, T>(ref v);
+                    }
+
+                case TypeCode.SByte:
+                    {
+                        var v = Convert.ToSByte(value);
+                        return Unsafe.As<SByte, T>(ref v);
+                    }
+
+                case TypeCode.UInt16:
+                    {
+                        var v = Convert.ToUInt16(value);
+                        return Unsafe.As<UInt16, T>(ref v);
+                    }
+
+                case TypeCode.UInt32:
+                    {
+                        var v = Convert.ToUInt32(value);
+                        return Unsafe.As<UInt32, T>(ref v);
+                    }
+
+                case TypeCode.UInt64:
+                    {
+                        var v = Convert.ToUInt64(value);
+                        return Unsafe.As<UInt64, T>(ref v);
+                    }
+
+                default:
+                    throw new InvalidOperationException();
+            }
+        }
+
+        public static T ToEnum(char value)
+        {
+            switch (GetUnderlyingTypeCode())
+            {
+                case TypeCode.Int32:
+                    {
+                        var v = Convert.ToInt32(value);
+                        return Unsafe.As<Int32, T>(ref v);
+                    }
+
+                case TypeCode.Byte:
+                    {
+                        var v = Convert.ToByte(value);
+                        return Unsafe.As<Byte, T>(ref v);
+                    }
+
+                case TypeCode.Char:
+                    return Unsafe.As<Char, T>(ref value);
+
+                case TypeCode.Int16:
+                    {
+                        var v = Convert.ToInt16(value);
+                        return Unsafe.As<Int16, T>(ref v);
+                    }
+
+                case TypeCode.Int64:
+                    {
+                        var v = Convert.ToInt64(value);
+                        return Unsafe.As<Int64, T>(ref v);
+                    }
+
+                case TypeCode.SByte:
+                    {
+                        var v = Convert.ToSByte(value);
+                        return Unsafe.As<SByte, T>(ref v);
+                    }
+
+                case TypeCode.UInt16:
+                    {
+                        var v = Convert.ToUInt16(value);
+                        return Unsafe.As<UInt16, T>(ref v);
+                    }
+
+                case TypeCode.UInt32:
+                    {
+                        var v = Convert.ToUInt32(value);
+                        return Unsafe.As<UInt32, T>(ref v);
+                    }
+
+                case TypeCode.UInt64:
+                    {
+                        var v = Convert.ToUInt64(value);
+                        return Unsafe.As<UInt64, T>(ref v);
+                    }
+
+                default:
+                    throw new InvalidOperationException();
+            }
+        }
+
+        public static T ToEnum(Int16 value)
+        {
+            switch (GetUnderlyingTypeCode())
+            {
+                case TypeCode.Int32:
+                    {
+                        var v = Convert.ToInt32(value);
+                        return Unsafe.As<Int32, T>(ref v);
+                    }
+
+                case TypeCode.Byte:
+                    {
+                        var v = Convert.ToByte(value);
+                        return Unsafe.As<Byte, T>(ref v);
+                    }
+
+                case TypeCode.Char:
+                    {
+                        var v = Convert.ToChar(value);
+                        return Unsafe.As<Char, T>(ref v);
+                    }
+
+                case TypeCode.Int16:
+                    {
+                        var v = Convert.ToInt16(value);
+                        return Unsafe.As<Int16, T>(ref v);
+                    }
+
+                case TypeCode.Int64:
+                    {
+                        var v = Convert.ToInt64(value);
+                        return Unsafe.As<Int64, T>(ref v);
+                    }
+
+                case TypeCode.SByte:
+                    {
+                        var v = Convert.ToSByte(value);
+                        return Unsafe.As<SByte, T>(ref v);
+                    }
+
+                case TypeCode.UInt16:
+                    {
+                        var v = Convert.ToUInt16(value);
+                        return Unsafe.As<UInt16, T>(ref v);
+                    }
+
+                case TypeCode.UInt32:
+                    {
+                        var v = Convert.ToUInt32(value);
+                        return Unsafe.As<UInt32, T>(ref v);
+                    }
+
+                case TypeCode.UInt64:
+                    {
+                        var v = Convert.ToUInt64(value);
+                        return Unsafe.As<UInt64, T>(ref v);
+                    }
+
+                default:
+                    throw new InvalidOperationException();
+            }
+        }
+
+        public static T ToEnum(Int64 value)
+        {
+            switch (GetUnderlyingTypeCode())
+            {
+                case TypeCode.Int32:
+                    {
+                        var v = Convert.ToInt32(value);
+                        return Unsafe.As<Int32, T>(ref v);
+                    }
+
+                case TypeCode.Byte:
+                    {
+                        var v = Convert.ToByte(value);
+                        return Unsafe.As<Byte, T>(ref v);
+                    }
+
+                case TypeCode.Char:
+                    {
+                        var v = Convert.ToChar(value);
+                        return Unsafe.As<Char, T>(ref v);
+                    }
+
+                case TypeCode.Int16:
+                    {
+                        var v = Convert.ToInt16(value);
+                        return Unsafe.As<Int16, T>(ref v);
+                    }
+
+                case TypeCode.Int64:
+                    {
+                        var v = Convert.ToInt64(value);
+                        return Unsafe.As<Int64, T>(ref v);
+                    }
+
+                case TypeCode.SByte:
+                    {
+                        var v = Convert.ToSByte(value);
+                        return Unsafe.As<SByte, T>(ref v);
+                    }
+
+                case TypeCode.UInt16:
+                    {
+                        var v = Convert.ToUInt16(value);
+                        return Unsafe.As<UInt16, T>(ref v);
+                    }
+
+                case TypeCode.UInt32:
+                    {
+                        var v = Convert.ToUInt32(value);
+                        return Unsafe.As<UInt32, T>(ref v);
+                    }
+
+                case TypeCode.UInt64:
+                    {
+                        var v = Convert.ToUInt64(value);
+                        return Unsafe.As<UInt64, T>(ref v);
+                    }
+
+                default:
+                    throw new InvalidOperationException();
+            }
+        }
+
+        public static T ToEnum(SByte value)
+        {
+            switch (GetUnderlyingTypeCode())
+            {
+                case TypeCode.Int32:
+                    {
+                        var v = Convert.ToInt32(value);
+                        return Unsafe.As<Int32, T>(ref v);
+                    }
+
+                case TypeCode.Byte:
+                    {
+                        var v = Convert.ToByte(value);
+                        return Unsafe.As<Byte, T>(ref v);
+                    }
+
+                case TypeCode.Char:
+                    {
+                        var v = Convert.ToChar(value);
+                        return Unsafe.As<Char, T>(ref v);
+                    }
+
+                case TypeCode.Int16:
+                    {
+                        var v = Convert.ToInt16(value);
+                        return Unsafe.As<Int16, T>(ref v);
+                    }
+
+                case TypeCode.Int64:
+                    {
+                        var v = Convert.ToInt64(value);
+                        return Unsafe.As<Int64, T>(ref v);
+                    }
+
+                case TypeCode.SByte:
+                    {
+                        var v = Convert.ToSByte(value);
+                        return Unsafe.As<SByte, T>(ref v);
+                    }
+
+                case TypeCode.UInt16:
+                    {
+                        var v = Convert.ToUInt16(value);
+                        return Unsafe.As<UInt16, T>(ref v);
+                    }
+
+                case TypeCode.UInt32:
+                    {
+                        var v = Convert.ToUInt32(value);
+                        return Unsafe.As<UInt32, T>(ref v);
+                    }
+
+                case TypeCode.UInt64:
+                    {
+                        var v = Convert.ToUInt64(value);
+                        return Unsafe.As<UInt64, T>(ref v);
+                    }
+
+                default:
+                    throw new InvalidOperationException();
+            }
+        }
+
+        public static T ToEnum(UInt16 value)
+        {
+            switch (GetUnderlyingTypeCode())
+            {
+                case TypeCode.Int32:
+                    {
+                        var v = Convert.ToInt32(value);
+                        return Unsafe.As<Int32, T>(ref v);
+                    }
+
+                case TypeCode.Byte:
+                    {
+                        var v = Convert.ToByte(value);
+                        return Unsafe.As<Byte, T>(ref v);
+                    }
+
+                case TypeCode.Char:
+                    {
+                        var v = Convert.ToChar(value);
+                        return Unsafe.As<Char, T>(ref v);
+                    }
+
+                case TypeCode.Int16:
+                    {
+                        var v = Convert.ToInt16(value);
+                        return Unsafe.As<Int16, T>(ref v);
+                    }
+
+                case TypeCode.Int64:
+                    {
+                        var v = Convert.ToInt64(value);
+                        return Unsafe.As<Int64, T>(ref v);
+                    }
+
+                case TypeCode.SByte:
+                    {
+                        var v = Convert.ToSByte(value);
+                        return Unsafe.As<SByte, T>(ref v);
+                    }
+
+                case TypeCode.UInt16:
+                    {
+                        var v = Convert.ToUInt16(value);
+                        return Unsafe.As<UInt16, T>(ref v);
+                    }
+
+                case TypeCode.UInt32:
+                    {
+                        var v = Convert.ToUInt32(value);
+                        return Unsafe.As<UInt32, T>(ref v);
+                    }
+
+                case TypeCode.UInt64:
+                    {
+                        var v = Convert.ToUInt64(value);
+                        return Unsafe.As<UInt64, T>(ref v);
+                    }
+
+                default:
+                    throw new InvalidOperationException();
+            }
+        }
+
+        public static T ToEnum(UInt32 value)
+        {
+            switch (GetUnderlyingTypeCode())
+            {
+                case TypeCode.Int32:
+                    {
+                        var v = Convert.ToInt32(value);
+                        return Unsafe.As<Int32, T>(ref v);
+                    }
+
+                case TypeCode.Byte:
+                    {
+                        var v = Convert.ToByte(value);
+                        return Unsafe.As<Byte, T>(ref v);
+                    }
+
+                case TypeCode.Char:
+                    {
+                        var v = Convert.ToChar(value);
+                        return Unsafe.As<Char, T>(ref v);
+                    }
+
+                case TypeCode.Int16:
+                    {
+                        var v = Convert.ToInt16(value);
+                        return Unsafe.As<Int16, T>(ref v);
+                    }
+
+                case TypeCode.Int64:
+                    {
+                        var v = Convert.ToInt64(value);
+                        return Unsafe.As<Int64, T>(ref v);
+                    }
+
+                case TypeCode.SByte:
+                    {
+                        var v = Convert.ToSByte(value);
+                        return Unsafe.As<SByte, T>(ref v);
+                    }
+
+                case TypeCode.UInt16:
+                    {
+                        var v = Convert.ToUInt16(value);
+                        return Unsafe.As<UInt16, T>(ref v);
+                    }
+
+                case TypeCode.UInt32:
+                    {
+                        var v = Convert.ToUInt32(value);
+                        return Unsafe.As<UInt32, T>(ref v);
+                    }
+
+                case TypeCode.UInt64:
+                    {
+                        var v = Convert.ToUInt64(value);
+                        return Unsafe.As<UInt64, T>(ref v);
+                    }
+
+                default:
+                    throw new InvalidOperationException();
+            }
+        }
+
+        public static T ToEnum(UInt64 value)
+        {
+            switch (GetUnderlyingTypeCode())
+            {
+                case TypeCode.Int32:
+                    {
+                        var v = Convert.ToInt32(value);
+                        return Unsafe.As<Int32, T>(ref v);
+                    }
+
+                case TypeCode.Byte:
+                    {
+                        var v = Convert.ToByte(value);
+                        return Unsafe.As<Byte, T>(ref v);
+                    }
+
+                case TypeCode.Char:
+                    {
+                        var v = Convert.ToChar(value);
+                        return Unsafe.As<Char, T>(ref v);
+                    }
+
+                case TypeCode.Int16:
+                    {
+                        var v = Convert.ToInt16(value);
+                        return Unsafe.As<Int16, T>(ref v);
+                    }
+
+                case TypeCode.Int64:
+                    {
+                        var v = Convert.ToInt64(value);
+                        return Unsafe.As<Int64, T>(ref v);
+                    }
+
+                case TypeCode.SByte:
+                    {
+                        var v = Convert.ToSByte(value);
+                        return Unsafe.As<SByte, T>(ref v);
+                    }
+
+                case TypeCode.UInt16:
+                    {
+                        var v = Convert.ToUInt16(value);
+                        return Unsafe.As<UInt16, T>(ref v);
+                    }
+
+                case TypeCode.UInt32:
+                    {
+                        var v = Convert.ToUInt32(value);
+                        return Unsafe.As<UInt32, T>(ref v);
+                    }
+
+                case TypeCode.UInt64:
+                    {
+                        var v = Convert.ToUInt64(value);
+                        return Unsafe.As<UInt64, T>(ref v);
+                    }
+
+                default:
+                    throw new InvalidOperationException();
+            }
+        }
+
+        public static T ToEnum(bool value)
+        {
+            switch (GetUnderlyingTypeCode())
+            {
+                case TypeCode.Int32:
+                    {
+                        var v = Convert.ToInt32(value);
+                        return Unsafe.As<Int32, T>(ref v);
+                    }
+
+                case TypeCode.Byte:
+                    {
+                        var v = Convert.ToByte(value);
+                        return Unsafe.As<Byte, T>(ref v);
+                    }
+
+                case TypeCode.Char:
+                    {
+                        var v = Convert.ToChar(value);
+                        return Unsafe.As<Char, T>(ref v);
+                    }
+
+                case TypeCode.Int16:
+                    {
+                        var v = Convert.ToInt16(value);
+                        return Unsafe.As<Int16, T>(ref v);
+                    }
+
+                case TypeCode.Int64:
+                    {
+                        var v = Convert.ToInt64(value);
+                        return Unsafe.As<Int64, T>(ref v);
+                    }
+
+                case TypeCode.SByte:
+                    {
+                        var v = Convert.ToSByte(value);
+                        return Unsafe.As<SByte, T>(ref v);
+                    }
+
+                case TypeCode.UInt16:
+                    {
+                        var v = Convert.ToUInt16(value);
+                        return Unsafe.As<UInt16, T>(ref v);
+                    }
+
+                case TypeCode.UInt32:
+                    {
+                        var v = Convert.ToUInt32(value);
+                        return Unsafe.As<UInt32, T>(ref v);
+                    }
+
+                case TypeCode.UInt64:
+                    {
+                        var v = Convert.ToUInt64(value);
+                        return Unsafe.As<UInt64, T>(ref v);
+                    }
+
+                default:
+                    throw new InvalidOperationException();
+            }
+        }
+
+        public static T ToEnum(object value)
+        {
+            switch (GetUnderlyingTypeCode())
+            {
+                case TypeCode.Int32:
+                    {
+                        var v = Convert.ToInt32(value);
+                        return Unsafe.As<Int32, T>(ref v);
+                    }
+
+                case TypeCode.Byte:
+                    {
+                        var v = Convert.ToByte(value);
+                        return Unsafe.As<Byte, T>(ref v);
+                    }
+
+                case TypeCode.Char:
+                    {
+                        var v = Convert.ToChar(value);
+                        return Unsafe.As<Char, T>(ref v);
+                    }
+
+                case TypeCode.Int16:
+                    {
+                        var v = Convert.ToInt16(value);
+                        return Unsafe.As<Int16, T>(ref v);
+                    }
+
+                case TypeCode.Int64:
+                    {
+                        var v = Convert.ToInt64(value);
+                        return Unsafe.As<Int64, T>(ref v);
+                    }
+
+                case TypeCode.SByte:
+                    {
+                        var v = Convert.ToSByte(value);
+                        return Unsafe.As<SByte, T>(ref v);
+                    }
+
+                case TypeCode.UInt16:
+                    {
+                        var v = Convert.ToUInt16(value);
+                        return Unsafe.As<UInt16, T>(ref v);
+                    }
+
+                case TypeCode.UInt32:
+                    {
+                        var v = Convert.ToUInt32(value);
+                        return Unsafe.As<UInt32, T>(ref v);
+                    }
+
+                case TypeCode.UInt64:
+                    {
+                        var v = Convert.ToUInt64(value);
+                        return Unsafe.As<UInt64, T>(ref v);
+                    }
+
+                default:
+                    throw new InvalidOperationException();
+            }
+        }
     }
 
     public class EnumInfo<T> : IEnumInfo<T> where T : struct, Enum
