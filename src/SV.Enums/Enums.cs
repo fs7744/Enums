@@ -151,6 +151,20 @@ namespace SV
             return Info;
         }
 
+        public static T Parse(string name, bool ignoreCase)
+        {
+            if (CheckInfo().TryParse(name, ignoreCase, out var result))
+                return result;
+            throw new ArgumentException($"Specified value '{name}' is not defined.", nameof(name));
+        }
+
+        public static T Parse(string name)
+        {
+            if (CheckInfo().TryParse(name, out var result))
+                return result;
+            throw new ArgumentException($"Specified value '{name}' is not defined.", nameof(name));
+        }
+
         public static bool TryParse(string name, bool ignoreCase, out T result)
         {
             return CheckInfo().TryParse(name, ignoreCase, out result);

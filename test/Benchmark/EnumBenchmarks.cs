@@ -185,7 +185,7 @@ namespace Benchmark
             };
         }
 
-        public override string GetName(Fruits t)
+        public override string? GetName(Fruits t)
         {
             switch (t)
             {
