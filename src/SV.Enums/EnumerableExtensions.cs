@@ -92,6 +92,32 @@ namespace System.Linq
             count = 0;
             return false;
         }
+
+        public static IEnumerable<TSource> DistinctBy<TSource, TKey>(this IEnumerable<TSource> source, Func<TSource, TKey> keySelector) => DistinctBy(source, keySelector, null);
+
+        public static IEnumerable<TSource> DistinctBy<TSource, TKey>(this IEnumerable<TSource> source, Func<TSource, TKey> keySelector, IEqualityComparer<TKey> comparer)
+        {
+            return DistinctByIterator(source, keySelector, comparer);
+        }
+
+        private static IEnumerable<TSource> DistinctByIterator<TSource, TKey>(IEnumerable<TSource> source, Func<TSource, TKey> keySelector, IEqualityComparer<TKey> comparer)
+        {
+            using IEnumerator<TSource> enumerator = source.GetEnumerator();
+
+            if (enumerator.MoveNext())
+            {
+                var set = new HashSet<TKey>(comparer);
+                do
+                {
+                    TSource element = enumerator.Current;
+                    if (set.Add(keySelector(element)))
+                    {
+                        yield return element;
+                    }
+                }
+                while (enumerator.MoveNext());
+            }
+        }
 #endif
 
         public static bool IsNullOrEmpty<T>(this List<T> source)

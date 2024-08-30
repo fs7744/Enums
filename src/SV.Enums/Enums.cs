@@ -45,6 +45,12 @@ namespace SV
         ImmutableArray<string> GetNames();
 
         ImmutableArray<T> GetValues();
+
+        bool IsDefined(string name);
+
+        bool IsFlags { get; }
+
+        bool IsEmpty { get; }
     }
 
     public abstract class EnumBase<T> : IEnumInfo<T> where T : struct, Enum
@@ -52,6 +58,8 @@ namespace SV
         private readonly Type underlyingType;
         private string[] names;
         private readonly T[] values;
+        public bool IsFlags { get; private set; }
+        public bool IsEmpty => values.Length == 0;
 
         public EnumBase()
         {
@@ -59,6 +67,7 @@ namespace SV
             underlyingType = Enum.GetUnderlyingType(t);
             names = Enum.GetNames(t);
             values = names.Select(i => (T)Enum.Parse(t, i)).ToArray();
+            IsFlags = t.IsDefined(typeof(FlagsAttribute), true);
         }
 
         public Type GetUnderlyingType() => underlyingType;
@@ -70,6 +79,8 @@ namespace SV
         protected abstract bool TryParseUnderlyingTypeString(string value, out T result);
 
         public abstract string GetName(T t);
+
+        public abstract bool IsDefined(string name);
 
         public ImmutableArray<string> GetNames()
         {
@@ -125,6 +136,9 @@ namespace SV
 
     public static class Enums<T> where T : struct, Enum
     {
+        public static bool IsFlags => CheckInfo().IsFlags;
+        public static bool IsEmpty => CheckInfo().IsEmpty;
+
         internal static IEnumInfo<T> Info;
 
         [MethodImpl(Enums.Optimization)]
@@ -161,6 +175,11 @@ namespace SV
         {
             return CheckInfo().GetValues();
         }
+
+        public static bool IsDefined(string name)
+        {
+            return CheckInfo().IsDefined(name);
+        }
     }
 
     public class EnumInfo<T> : IEnumInfo<T> where T : struct, Enum
@@ -172,6 +191,8 @@ namespace SV
         private readonly IReadOnlyDictionary<T, string> namesByMember;
         private readonly IEnumUnderlyingTypeInfo enumUnderlyingTypeInfo;
         private readonly Type underlyingType;
+        public bool IsFlags { get; private set; }
+        public bool IsEmpty => values.Length == 0;
 
         public EnumInfo()
         {
@@ -180,9 +201,10 @@ namespace SV
             members = names.Select(i => (i, (T)Enum.Parse(t, i))).ToArray();
             values = members.Select(i => i.Value).ToArray();
             membersByName = members.ToFastReadOnlyDictionary(i => i.Name, i => i.Value);
-            namesByMember = membersByName.AsEnumerable().ToFastReadOnlyDictionary(i => i.Value, i => i.Key);
+            namesByMember = membersByName.AsEnumerable().DistinctBy(i => i.Value).ToFastReadOnlyDictionary(i => i.Value, i => i.Key);
             underlyingType = Enum.GetUnderlyingType(t);
             enumUnderlyingTypeInfo = Enums.EnumUnderlyingTypeInfos[underlyingType];
+            IsFlags = t.IsDefined(typeof(FlagsAttribute), true);
         }
 
         [MethodImpl(Enums.Optimization)]
@@ -236,5 +258,10 @@ namespace SV
         }
 
         public Type GetUnderlyingType() => underlyingType;
+
+        public bool IsDefined(string name)
+        {
+            return membersByName.TryGetValue(name, out var r);
+        }
     }
 }

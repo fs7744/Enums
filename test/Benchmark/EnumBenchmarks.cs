@@ -145,10 +145,46 @@ namespace Benchmark
         {
             return Enums<Fruits>.GetValues();
         }
+
+        [Benchmark(Baseline = true), BenchmarkCategory("IsDefinedName")]
+        public bool IsDefinedName()
+        {
+            return Enum.TryParse<Fruits>("Melon", false, out var r);
+        }
+
+        [Benchmark, BenchmarkCategory("IsDefinedName")]
+        public bool FastEnumIsDefinedName()
+        {
+            return FastEnum.IsDefined<Fruits>("Melon");
+        }
+
+        [Benchmark, BenchmarkCategory("IsDefinedName")]
+        public bool SVEnumsIsDefinedName()
+        {
+            return Enums<Fruits>.IsDefined("Melon");
+        }
+
+        [Benchmark, BenchmarkCategory("IsDefinedName")]
+        public bool EnumInfoIsDefinedName()
+        {
+            return test.IsDefined("Melon");
+        }
     }
 
     public class TestIEnumInfo : EnumBase<Fruits>
     {
+        public override bool IsDefined(string name)
+        {
+            return name switch
+            {
+                nameof(global::Benchmark.Fruits.Apple) => true,
+                nameof(global::Benchmark.Fruits.Lemon) => true,
+                nameof(global::Benchmark.Fruits.Melon) => true,
+                nameof(global::Benchmark.Fruits.Banana) => true,
+                _ => false,
+            };
+        }
+
         public override string GetName(Fruits t)
         {
             switch (t)
