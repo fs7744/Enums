@@ -244,6 +244,7 @@ namespace UT
             if (!EnumInfos.TryGetValue(typeof(T), out var info))
             {
                 info = new EnumInfo<T>();
+                EnumInfos.Add(typeof(T), info);
             }
             return (IEnumInfo<T>)info;
         }
