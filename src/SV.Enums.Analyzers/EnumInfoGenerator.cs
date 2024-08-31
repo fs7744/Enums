@@ -52,7 +52,7 @@ namespace SV
 }}
             ";
 
-                context.AddSource((state.Compilation.AssemblyName ?? "package") + ".generated.cs", src);
+                context.AddSource((state.Compilation.AssemblyName ?? "package") + ".g.cs", src);
             }
             catch (Exception ex)
             {
