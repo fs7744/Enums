@@ -467,5 +467,64 @@ namespace UT
             Check<Fruits2>();
             Check<TypeCode>();
         }
+
+        [Fact]
+        public void IsFlagsShouldBeSame()
+        {
+            void Check<T>() where T : struct, Enum
+            {
+                var t = typeof(T);
+                var vs = t.IsDefined(typeof(FlagsAttribute), true);
+
+                Assert.Equal(vs, Enums<T>.IsFlags);
+                Assert.Equal(vs, GetEnumInfo<T>().IsFlags);
+            }
+            Check<FruitsByte>();
+            Check<FruitsSByte>();
+            Check<FruitsShort>();
+            Check<FruitsUShort>();
+            Check<FruitsLong>();
+            Check<FruitsULong>();
+            Check<FruitsUInt>();
+            Check<FruitsInt>();
+            Check<Fruits2>();
+            Check<TypeCode>();
+        }
+
+        [Fact]
+        public void ToEnumShouldBeSame()
+        {
+            void Check<T>() where T : struct, Enum
+            {
+                var t = typeof(T);
+                T[] vs = (T[])Enum.GetValues(t);
+
+                foreach (var v in vs)
+                {
+                    Assert.Equal(v, Enums<T>.ToEnum(Convert.ToInt16(v)));
+                    Assert.Equal(v, Enums<T>.ToEnum(Convert.ToInt32(v)));
+                    Assert.Equal(v, Enums<T>.ToEnum(Convert.ToInt64(v)));
+                    Assert.Equal(v, Enums<T>.ToEnum(Convert.ToUInt16(v)));
+                    Assert.Equal(v, Enums<T>.ToEnum(Convert.ToUInt32(v)));
+                    Assert.Equal(v, Enums<T>.ToEnum(Convert.ToUInt64(v)));
+                    Assert.Equal(v, Enums<T>.ToEnum(Convert.ToByte(v)));
+                    Assert.Equal(v, Enums<T>.ToEnum(Convert.ToSByte(v)));
+                    Assert.Equal(v, Enums<T>.ToEnum(Convert.ToChar(v)));
+                    Assert.Equal(v, Enums<T>.ToEnum(v.ToString()));
+                    Assert.Equal(v, Enums<T>.ToEnum(Convert.ToInt64(v).ToString()));
+                    Assert.Equal(v, Enums<T>.ToEnum((object)v));
+                }
+            }
+            Check<FruitsByte>();
+            Check<FruitsSByte>();
+            Check<FruitsShort>();
+            Check<FruitsUShort>();
+            Check<FruitsLong>();
+            Check<FruitsULong>();
+            Check<FruitsUInt>();
+            Check<FruitsInt>();
+            Check<Fruits2>();
+            Check<TypeCode>();
+        }
     }
 }
