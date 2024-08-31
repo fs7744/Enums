@@ -345,6 +345,8 @@ namespace UT
                     Assert.Equal(n, Enums<T>.GetName(v));
                     Assert.Equal(n, GetEnumInfo<T>().GetName(v));
                 }
+                Assert.False(Enums<T>.TryParse("xxxxx", out var vv));
+                Assert.False(GetEnumInfo<T>().TryParse("xxxxx", out vv));
             }
             Check<FruitsByte>();
             Check<FruitsSByte>();
