@@ -6,19 +6,20 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{57DDD11A-6F47-4C9F-B813-8C0DED88EB3B}"
 	ProjectSection(SolutionItems) = preProject
 		ProjectCommon.targets = ProjectCommon.targets
+		README.md = README.md
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{04EFFB02-8A70-40C6-9CFC-8AA1C053640B}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{2ADDCD0F-6F42-4C20-84BF-D8D344CF7396}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SV.Enums", "src\SV.Enums\SV.Enums.csproj", "{95B1F59B-33E4-479B-8201-B691E1641233}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SV.Enums", "src\SV.Enums\SV.Enums.csproj", "{95B1F59B-33E4-479B-8201-B691E1641233}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SV.Enums.Analyzers", "src\SV.Enums.Analyzers\SV.Enums.Analyzers.csproj", "{53751474-A1DD-4A70-B5B9-A4F55F6960AF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SV.Enums.Analyzers", "src\SV.Enums.Analyzers\SV.Enums.Analyzers.csproj", "{53751474-A1DD-4A70-B5B9-A4F55F6960AF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UT", "test\UT\UT.csproj", "{B3AE211A-0267-4537-8460-2D496D3FB286}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UT", "test\UT\UT.csproj", "{B3AE211A-0267-4537-8460-2D496D3FB286}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Benchmark", "test\Benchmark\Benchmark.csproj", "{FC63B304-F557-4EA2-B6D0-D457EC0B9A3F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Benchmark", "test\Benchmark\Benchmark.csproj", "{FC63B304-F557-4EA2-B6D0-D457EC0B9A3F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
