@@ -7,7 +7,12 @@
 	  <IncludeBuildOutput>false</IncludeBuildOutput>
 	  <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
 	  <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+	  <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
+
+	<ItemGroup>
+		<None Include="../../README.md" Pack="true" />
+	</ItemGroup>
 	<ItemGroup>
 		<PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.4" Pack="false" PrivateAssets="all" />
 		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.10.0" Pack="false" PrivateAssets="all" />
