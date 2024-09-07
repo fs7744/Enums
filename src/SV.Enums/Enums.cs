@@ -976,6 +976,11 @@ namespace SV
 
         public static T ToEnum(object value)
         {
+            if (value is string s)
+            {
+                return ToEnum(s);
+            }
+
             switch (GetUnderlyingTypeCode())
             {
                 case TypeCode.Int32:
