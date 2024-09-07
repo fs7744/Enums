@@ -1111,6 +1111,9 @@ namespace SV
         private readonly (string Name, T Value)[] members;
         private readonly FastReadOnlyDictionary<string, T> membersByName;
         private readonly FastReadOnlyDictionary<T, (string Name, EnumMemberAttribute Member, FastReadOnlyDictionary<int, string> Labels)> namesByMember;
+#if NET7_0_OR_GREATER
+        private readonly ReadOnlyOrdinalIgnoreCaseStringDictionary<T> membersByNameOrdinalIgnoreCase;
+#endif
         private readonly Type underlyingType;
         private readonly TypeCode underlyingTypeCode;
 
@@ -1129,6 +1132,9 @@ namespace SV
                 var fieldInfo = t.GetField(i.Key)!;
                 return (i.Key, fieldInfo.GetCustomAttribute<EnumMemberAttribute>(), fieldInfo.GetCustomAttributes<LabelAttribute>().DistinctBy(i => i.Index).ToFastReadOnlyDictionary(x => x.Index, x => x.Value));
             });
+#if NET7_0_OR_GREATER
+            membersByNameOrdinalIgnoreCase = membersByName.AllKV().ToReadOnlyOrdinalIgnoreCaseStringDictionary();
+#endif
             underlyingType = Enum.GetUnderlyingType(t);
             underlyingTypeCode = Type.GetTypeCode(underlyingType);
             IsFlags = t.IsDefined(typeof(FlagsAttribute), true);
@@ -1137,6 +1143,9 @@ namespace SV
         [MethodImpl(Enums.Optimization)]
         public bool TryParseIgnoreCase(in ReadOnlySpan<char> name, out T result)
         {
+#if NET7_0_OR_GREATER
+            return membersByNameOrdinalIgnoreCase.TryGetValueSpan(name, out result);
+#else
             foreach (var member in members.AsSpan())
             {
                 if (name.Equals(member.Name.AsSpan(), StringComparison.OrdinalIgnoreCase))
@@ -1147,6 +1156,7 @@ namespace SV
             }
             result = default;
             return false;
+#endif
         }
 
         public bool TryParse(string name, bool ignoreCase, out T result)

@@ -2,6 +2,7 @@
 	<PropertyGroup>
 	  <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 	  <PackageReadmeFile>README.md</PackageReadmeFile>
+	  <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 	</PropertyGroup>
 	<Import Project="../../ProjectCommon.targets" />
 

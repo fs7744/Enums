@@ -178,6 +178,16 @@ namespace System.Linq
         {
             return new FastReadOnlyDictionary<TKey, TValue>(source.Select(i => new KeyValuePair<TKey, TValue>(keySelector(i), valueSelector(i))));
         }
+
+        public static ReadOnlyOrdinalIgnoreCaseStringDictionary<TValue> ToReadOnlyOrdinalIgnoreCaseStringDictionary<TSource, TValue>(this IEnumerable<TSource> source, Func<TSource, string> keySelector, Func<TSource, TValue> valueSelector)
+        {
+            return new ReadOnlyOrdinalIgnoreCaseStringDictionary<TValue>(source.Select(i => new KeyValuePair<string, TValue>(keySelector(i), valueSelector(i))));
+        }
+
+        public static ReadOnlyOrdinalIgnoreCaseStringDictionary<TValue> ToReadOnlyOrdinalIgnoreCaseStringDictionary<TValue>(this IEnumerable<KeyValuePair<string, TValue>> source)
+        {
+            return new ReadOnlyOrdinalIgnoreCaseStringDictionary<TValue>(source);
+        }
     }
 
     internal sealed class EmptyAsyncEnumerator<TValue> : IAsyncEnumerator<TValue>, IAsyncEnumerable<TValue>
