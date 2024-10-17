@@ -21,12 +21,14 @@ jobs:
         dotnet-version: 8.0.x
     - name: Restore dependencies
       run: dotnet restore
-    - name: Build
-      run: dotnet build --no-restore
+    - name: BuildTest
+      run: dotnet build
     - name: Test
       run: dotnet test --no-build --verbosity normal
-    - name: package
-      run: dotnet pack -c Release
+    - name: Clean
+      run: dotnet clean
+    - name: Build
+      run: dotnet build --configuration Release --no-restore
     - name: push
       env: 
         nugetkey: ${{ secrets.nugetkey }}
