@@ -17,7 +17,7 @@ namespace System.Linq
             else
             {
                 var totalCount = (int)Math.Ceiling(source.Count * 1.0 / pageSize);
-                for (int i = 0; i <= totalCount; i++)
+                for (int i = 0; i < totalCount; i++)
                 {
                     yield return source.Skip(pageSize * i).Take(pageSize);
                 }
