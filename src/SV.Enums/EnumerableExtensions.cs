@@ -10,7 +10,11 @@ namespace System.Linq
     {
         public static IEnumerable<IEnumerable<T>> Chunk<T>(this List<T> source, int pageSize)
         {
-            if (source.Count <= pageSize)
+            if (source == null || source.Count == 0)
+            {
+                yield break;
+            }
+            else if (source.Count <= pageSize)
             {
                 yield return source;
             }
